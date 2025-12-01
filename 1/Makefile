@@ -1,5 +1,5 @@
 # structure
-NAME = ac1a
+NAME = ac1
 CC = cc
 INCDIR = .
 BUILD = .build

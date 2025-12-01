@@ -6,7 +6,7 @@
 /*   By: ldecavel <ldecavel@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/01 11:32:09 by ldecavel          #+#    #+#             */
-/*   Updated: 2025/12/01 12:55:04 by ldecavel         ###   ########.fr       */
+/*   Updated: 2025/12/01 18:50:25 by ldecavel         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,27 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-int	decrypt(int c, int n)
+int	decrypt(int c, int n, int mode)
 {
 	static int	dial = 50;
+	int			iter_on_zero = 0;
 
-	if (c == 'L')
-		dial += n;
-	else if (c == 'R')
-		dial -= n;
-	else
+	while (n--)
 	{
-		dprintf(2, "Wrong file\n");
-		exit(1);
+		if (c == 'L')
+			dial--;
+		else
+			dial++;
+		if (dial == 100)
+			dial = 0;
+		if (dial == -1)
+			dial = 99;
+		if (dial == 0 && mode == 'b')
+			iter_on_zero++;
 	}
-	return (dial % 100);
+	if (mode == 'a' && dial == 0)
+		return (1);
+	return (iter_on_zero);
 }
 
 int	main(int ac, char **av)
@@ -38,9 +45,10 @@ int	main(int ac, char **av)
 	int		res = 0;
 	char	*s;
 
-	if (ac != 2)
+	if (ac != 3 || !(av[2][0] == 'a' || av[2][0] == 'b'))
 	{
-		dprintf(2, "Please use two arguments\n");
+		dprintf(2, "Please use three arguments\n");
+		dprintf(2, "usage: ./ac1 input a | ./ac1 input b\n");
 		return (1);
 	}
 	fd = open(av[1], O_RDONLY);
@@ -48,8 +56,13 @@ int	main(int ac, char **av)
 		return (1);
 	while ((s = get_next_line(fd)))
 	{
-		if (decrypt(s[0], atoi(&s[1])) == 0)
-			res++;
+		if (s[0] != 'L' && s[0] != 'R')
+		{
+			dprintf(2, "Wrong input file\n");
+			free(s);
+			return (1);
+		}
+		res += decrypt(s[0], atoi(&s[1]), av[2][0]);
 		free(s);
 	}
 	printf("%d\n", res);
