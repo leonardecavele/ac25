@@ -1,31 +1,29 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    1.py                                               :+:      :+:    :+:    #
+#    2.py                                               :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: ldecavel <ldecavel@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/12/02 15:34:57 by ldecavel          #+#    #+#              #
-#    Updated: 2025/12/03 10:19:29 by ldecavel         ###   ########lyon.fr    #
+#    Created: 2025/12/03 09:43:40 by ldecavel          #+#    #+#              #
+#    Updated: 2025/12/03 11:53:32 by ldecavel         ###   ########lyon.fr    #
 #                                                                              #
 # **************************************************************************** #
 
-def is_id_doubled(s: str) -> bool:
-    if len(s) % 2 != 0:
-        return False
-    return s[:len(s) // 2] == s[len(s) // 2:]
+def biggest_in_line(line: str, size: int) -> int:
+    result = 0
+    current = 0
+    for j in range(size, 0, -1):
+        biggest = 0
+        for i in range(current, len(line) - j + 1, 1):
+            if int(line[i]) > biggest:
+                biggest = int(line[i])
+                current = i + 1
+        result = result * 10 + biggest
+    return result
 
 result = 0
-ids: list[tuple[int, int]] = []
-
 with open("input", "r", encoding="utf-8") as f:
-    line = f.readline().rstrip("\n")
-    for bit in line.split(","):
-        bit = bit.strip()
-        a, b = map(int, bit.split("-"))
-        ids.append((a, b))
-for pair in ids:
-    for i in range(pair[0], pair[1] + 1): 
-        if is_id_doubled(str(i)):
-            result += i
+    for line in f:
+        result += biggest_in_line(line.rstrip("\n"), 12)
 print(result)
